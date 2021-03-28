@@ -336,6 +336,9 @@ def main():
 
 	input_folder_path = os.path.dirname(input_file_path).replace('\\','/')
 
+	if input_folder_path[len(input_folder_path) - 1] == '/':
+		input_folder_path = input_folder_path[:-1]
+
 	if args.output == "":
 		input_file_name = os.path.basename(input_file_path)
 		input_file_name_length = len(input_file_name)
@@ -357,9 +360,6 @@ def main():
 		output_file_path = os.path.abspath(args.output).replace('\\','/')
 
 		output_folder_path = os.path.dirname(output_file_path).replace('\\','/')
-
-	if output_folder_path[len(output_folder_path) - 1] == '/':
-		output_folder_path = output_folder_path[:-1]
 	
 	if args.dry_run is False:
 		distutils.dir_util.mkpath(output_folder_path)
