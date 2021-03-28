@@ -265,6 +265,10 @@ def print_ranges_help():
 Debug = False
 
 parser = MyParser(description='bin texts parser')
+
+# note :
+# if requiring 2 groups of characters they work together in an "or" statement
+# for example if requiring both lowers and uppers, then require a text to at least have 1 lower or upper letter in order for it to get added
 		
 if Debug is False:
 	parser.add_argument('--input', required=False, type=str, help='bin file')
@@ -279,6 +283,12 @@ if Debug is False:
 	parser.add_argument('--not-numbers', required=False, default=False, action='store_true', help='do not define numbers as text')
 	parser.add_argument('--not-uppers', required=False, default=False, action='store_true', help='do not define uppers as text')
 	parser.add_argument('--not-lowers', required=False, default=False, action='store_true', help='do not define lowers as text')
+	parser.add_argument('--require-controls', required=False, default=False, action='store_true', help='require controls in every text')
+	parser.add_argument('--require-spaces', required=False, default=False, action='store_true', help='require spaces in every text')
+	parser.add_argument('--require-symbols', required=False, default=False, action='store_true', help='require symbols in every text')
+	parser.add_argument('--require-numbers', required=False, default=False, action='store_true', help='require numbers in every text')
+	parser.add_argument('--require-uppers', required=False, default=False, action='store_true', help='require uppers in every text')
+	parser.add_argument('--require-lowers', required=False, default=False, action='store_true', help='require lowers in every text')
 
 	if len(sys.argv) == 1:
 		parser.print_usage()
@@ -296,6 +306,12 @@ else:
 	parser.add_argument('--not-numbers', required=False, default=False, action='store_true', help='do not define numbers as text')
 	parser.add_argument('--not-uppers', required=False, default=False, action='store_true', help='do not define uppers as text')
 	parser.add_argument('--not-lowers', required=False, default=False, action='store_true', help='do not define lowers as text')
+	parser.add_argument('--require-controls', required=False, default=False, action='store_true', help='require controls in every text')
+	parser.add_argument('--require-spaces', required=False, default=False, action='store_true', help='require spaces in every text')
+	parser.add_argument('--require-symbols', required=False, default=False, action='store_true', help='require symbols in every text')
+	parser.add_argument('--require-numbers', required=False, default=False, action='store_true', help='require numbers in every text')
+	parser.add_argument('--require-uppers', required=False, default=False, action='store_true', help='require uppers in every text')
+	parser.add_argument('--require-lowers', required=False, default=False, action='store_true', help='require lowers in every text')
 
 args = parser.parse_args()
 
@@ -380,6 +396,12 @@ def main():
 		+ "Include Numbers:"+ ' ' + ("False" if args.not_numbers is True else "True") + "\n"
 		+ "Include Uppers:"+ ' ' + ("False" if args.not_uppers is True else "True") + "\n"
 		+ "Include Lowers:"+ ' ' + ("False" if args.not_lowers is True else "True")
+		+ "Require Controls:"+ ' ' + ("True" if args.require_controls is True else "False") + "\n"
+		+ "Require Spaces:"+ ' ' + ("True" if args.require_spaces is True else "False") + "\n"
+		+ "Require Symbols:"+ ' ' + ("True" if args.require_symbols is True else "False") + "\n"
+		+ "Require Numbers:"+ ' ' + ("True" if args.require_numbers is True else "False") + "\n"
+		+ "Require Uppers:"+ ' ' + ("True" if args.require_uppers is True else "False") + "\n"
+		+ "Require Lowers:"+ ' ' + ("True" if args.require_lowers is True else "False")
 	)
 
 	print("")
@@ -412,6 +434,13 @@ def main():
 
 	current_text_list = []
 	current_text_length = 0
+
+	found_controls = False
+	found_spaces = False
+	found_symbols = False
+	found_numbers = False
+	found_uppers = False
+	found_lowers = False
 	
 	with open(input_file_path, 'rb') as inpf:
 		while location < input_file_size:
@@ -443,6 +472,19 @@ def main():
 						max = range[1]
 
 						if current_text_length < max or max == 0:
+							if input_file_data_cell in controls:
+								found_controls = True
+							elif input_file_data_cell in spaces:
+								found_spaces = True
+							elif input_file_data_cell in symbols:
+								found_symbols = True
+							elif input_file_data_cell in numbers:
+								found_numbers = True
+							elif input_file_data_cell in uppers:
+								found_uppers = True
+							elif input_file_data_cell in lowers:
+								found_lowers = True
+
 							if input_file_data_cell in controls and input_file_data_cell != '\t':# allow only the '\t' control to get added as a character
 								current_text_list.append(' ')
 							else:
@@ -453,52 +495,98 @@ def main():
 							break
 				else:
 					if current_text_length > 0:
-						for range in ranges:
-							min = range[0]
-							max = range[1]
-
-							if current_text_length >= min and (current_text_length <= max or max == 0):
-								text = (
-									add_text(
-										location
-										, current_text_list
-										, current_text_length
-									)
+						if (
+							args.require_controls is False
+							and args.require_spaces is False
+							and args.require_symbols is False
+							and args.require_numbers is False
+							and args.require_uppers is False
+							and args.require_lowers is False
+							or (
+								(args.require_controls is True and found_controls is True)
+								or (args.require_spaces is True and found_spaces is True)
+								or (args.require_symbols is True and found_symbols is True)
+								or (args.require_numbers is True and found_numbers is True)
+								or (args.require_uppers is True and found_uppers is True)
+								or (args.require_lowers is True and found_lowers is True)
 								)
+							):
+							for range in ranges:
+								min = range[0]
+								max = range[1]
 
-								texts.append(text)
-								texts_amount += 1
+								if current_text_length >= min and (current_text_length <= max or max == 0):
+									text = (
+										add_text(
+											location
+											, current_text_list
+											, current_text_length
+										)
+									)
 
-								break
+									texts.append(text)
+									texts_amount += 1
+
+									break
 
 						current_text_list = []
 						current_text_length = 0
+
+						found_controls = False
+						found_spaces = False
+						found_symbols = False
+						found_numbers = False
+						found_uppers = False
+						found_lowers = False
 
 				location += 1
 
 				buffer_index += 1
 
 		if current_text_length > 0:
-			for range in ranges:
-				min = range[0]
-				max = range[1]
-
-				if current_text_length >= min and (current_text_length <= max or max == 0):
-					text = (
-						add_text(
-							location
-							, current_text_list
-							, current_text_length
-						)
+			if (
+				args.require_controls is False
+				and args.require_spaces is False
+				and args.require_symbols is False
+				and args.require_numbers is False
+				and args.require_uppers is False
+				and args.require_lowers is False
+				or (
+					(args.require_controls is True and found_controls is True)
+					or (args.require_spaces is True and found_spaces is True)
+					or (args.require_symbols is True and found_symbols is True)
+					or (args.require_numbers is True and found_numbers is True)
+					or (args.require_uppers is True and found_uppers is True)
+					or (args.require_lowers is True and found_lowers is True)
 					)
+				):
+				for range in ranges:
+					min = range[0]
+					max = range[1]
 
-					texts.append(text)
-					texts_amount += 1
+					if current_text_length >= min and (current_text_length <= max or max == 0):
+						text = (
+							add_text(
+								location
+								, current_text_list
+								, current_text_length
+							)
+						)
 
-					break
+						texts.append(text)
+						texts_amount += 1
+
+						break
 
 			current_text_list = []
 			current_text_length = 0
+
+			found_controls = False
+			found_spaces = False
+			found_symbols = False
+			found_numbers = False
+			found_uppers = False
+			found_lowers = False
 
 	if texts_amount > 0:
 		print("")
