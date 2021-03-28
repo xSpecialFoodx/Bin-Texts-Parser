@@ -267,7 +267,7 @@ Debug = False
 parser = MyParser(description='bin texts parser')
 		
 if Debug is False:
-	parser.add_argument('--input', required=True, type=str, help='bin file')
+	parser.add_argument('--input', required=False, type=str, help='bin file')
 	parser.add_argument('--output', required=False, default="", type=str, help='new text file')
 	parser.add_argument('--dry-run', required=False, default=False, action='store_true', help='if inserted then nothing will be written to the output file')
 	parser.add_argument('--verbose', required=False, default=False, action='store_true', help='detailed printing')
