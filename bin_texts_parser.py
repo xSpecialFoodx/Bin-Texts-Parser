@@ -395,7 +395,7 @@ def main():
 		+ "Include Symbols:"+ ' ' + ("False" if args.not_symbols is True else "True") + "\n"
 		+ "Include Numbers:"+ ' ' + ("False" if args.not_numbers is True else "True") + "\n"
 		+ "Include Uppers:"+ ' ' + ("False" if args.not_uppers is True else "True") + "\n"
-		+ "Include Lowers:"+ ' ' + ("False" if args.not_lowers is True else "True")
+		+ "Include Lowers:"+ ' ' + ("False" if args.not_lowers is True else "True") + "\n"
 		+ "Require Controls:"+ ' ' + ("True" if args.require_controls is True else "False") + "\n"
 		+ "Require Spaces:"+ ' ' + ("True" if args.require_spaces is True else "False") + "\n"
 		+ "Require Symbols:"+ ' ' + ("True" if args.require_symbols is True else "False") + "\n"
